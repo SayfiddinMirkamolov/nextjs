@@ -1,113 +1,123 @@
-import Image from "next/image";
+'use client'
+
+import { useEffect, useState } from 'react'
 
 export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+	const [countries, setCountries] = useState([])
+	const [searchTerm, setSearchTerm] = useState('')
+	const [selectedRegion, setSelectedRegion] = useState('0')
+	const [darkMode, setDarkMode] = useState(false)
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+	useEffect(() => {
+		const fetchCountries = async () => {
+			const api = 'https://restcountries.com/v3.1/all'
+			try {
+				const response = await fetch(api)
+				const data = await response.json()
+				setCountries(data)
+			} catch (error) {
+				console.error('Server is broken', error.message)
+			}
+		}
+		fetchCountries()
+	}, [])
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+	const filteredCountries = countries.filter(country => {
+		const countryName = country.name.common.toLowerCase()
+		const countryRegion = country.region
+		const matchesSearch = countryName.includes(searchTerm.toLowerCase())
+		const matchesRegion =
+			selectedRegion === '0' || countryRegion === selectedRegion
+		return matchesSearch && matchesRegion
+	})
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+	const toggleDarkMode = () => {
+		setDarkMode(!darkMode)
+	}
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
+	return (
+		<div
+			className={darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-black'}
+		>
+			<header className='bg-white dark:bg-gray-800 shadow-md py-4'>
+				<div className='container mx-auto flex justify-between items-center'>
+					<a href='#' className='text-2xl font-bold'>
+						Where in the world?
+					</a>
+					<button
+						onClick={toggleDarkMode}
+						className='flex items-center focus:outline-none'
+					>
+						<img src='/images/Path.svg' alt='dark mode icon' className='mr-2' />
+						<h4 className='font-semibold'>
+							{darkMode ? 'Light Mode' : 'Dark Mode'}
+						</h4>
+					</button>
+				</div>
+			</header>
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+			<section className='container mx-auto py-8 flex justify-between items-center flex-wrap'>
+				<input
+					type='text'
+					placeholder='Search for a country…'
+					value={searchTerm}
+					onChange={e => setSearchTerm(e.target.value)}
+					className={`w-full md:w-1/3 p-3 rounded-lg shadow-md focus:outline-none ${
+						darkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'
+					}`}
+				/>
+				<select
+					value={selectedRegion}
+					onChange={e => setSelectedRegion(e.target.value)}
+					className={`mt-4 md:mt-0 p-3 rounded-lg shadow-md focus:outline-none ${
+						darkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'
+					}`}
+				>
+					<option value='0'>Sort by regions</option>
+					<option value='Africa'>Africa</option>
+					<option value='America'>America</option>
+					<option value='Asia'>Asia</option>
+					<option value='Europe'>Europe</option>
+					<option value='Oceania'>Oceania</option>
+				</select>
+			</section>
+
+			<section className='container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8'>
+				{filteredCountries.length > 0 ? (
+					filteredCountries.map(country => (
+						<div
+							key={country.name.common}
+							className={`rounded-lg shadow-lg overflow-hidden ${
+								darkMode ? 'bg-gray-800' : 'bg-white'
+							}`}
+						>
+							<img
+								src={country.flags.png}
+								alt={`${country.name.common} flag`}
+								className='w-full h-48 object-cover'
+							/>
+							<div className='p-6'>
+								<h2 className='text-xl font-bold mb-2'>
+									{country.name.common}
+								</h2>
+								<p className='text-sm'>
+									Population: {country.population.toLocaleString()}
+								</p>
+								<p className='text-sm'>Region: {country.region}</p>
+								<p className='text-sm'>Capital: {country.capital}</p>
+								<div className="text-right mt-4">
+  <a href={`/about/${country.name.common.toLowerCase()}`} className="text-blue-500 hover:underline">
+    About this country
+  </a>
+</div>
+
+							</div>
+						</div>
+					))
+				) : (
+					<div className='text-center text-xl'>No countries found</div>
+				)}
+			</section>
+		</div>
+	)
 }
